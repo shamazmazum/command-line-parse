@@ -40,13 +40,13 @@ and/or the long form (like '--foo VAR')."
 
 ;; Argument
 
-(defclass argument (has-name)
+(defclass argument (has-name has-metavar)
   ()
   (:documentation "A parser for positional argument"))
 
-(defun argument (name)
+(defun argument (name meta &key (fn #'identity))
   "Make a parser for a positional argument."
-  (make-instance 'argument :name name))
+  (make-instance 'argument :name name :meta meta :fn fn))
 
 ;; Arguments
 (defclass arguments (has-name)
@@ -70,7 +70,7 @@ positional arguments."
   (:documentation "A parser for subcommands"))
 
 (defun command (name command value)
-  "Make a parser for a subcommand. Produces a cons pair (WHAT . VALUE)
+  "Make a parser for a subcommand. Produces a cons pair (NAME . VALUE)
 if COMMAND is seen in the input."
   (make-instance 'command :name name :command command :value value))
 

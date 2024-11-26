@@ -22,7 +22,11 @@
 
 (defmethod parse-input ((argument argument) input &optional acc)
   (if input
-      (values (acons (name argument) (car input) acc) (cdr input) t)
+      (values
+       (acons (name argument)
+              (funcall (meta-fn argument) (car input))
+              acc)
+       (cdr input) t)
       (error 'cmd-line-parse-error
              :format-control   "Abrupt ending of the input: argument ~a missing"
              :format-arguments (list argument))))

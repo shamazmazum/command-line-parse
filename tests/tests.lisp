@@ -29,7 +29,7 @@
     (optional
      (option 'level "LEVEL" :short #\l :long "level" :fn #'parse-number)
      (flag   'force :long "force"))
-    (argument 'disk))
+    (argument 'disk "DISK"))
    (seq
     (command 'what "process" 'process)
     (choice
@@ -42,8 +42,8 @@
    (optional
     (flag 'foo :short #\f :long "foo")
     (flag 'bar :short #\b :long "bar"))
-   (argument 'arg0)
-   (argument 'arg1)))
+   (argument 'arg0 "ARG0")
+   (argument 'arg1 "ARG1")))
 
 (in-suite suite-1)
 
