@@ -80,6 +80,21 @@ like switches and options"))
     ((and short (string= (car input) (short-str short))) t)
     (t nil)))
 
+(serapeum:-> show-flag ((or-null string)
+                        (or-null character))
+             (values string &optional))
+(defun show-flag (long short)
+  "Pring flag usage"
+  (cond
+    ((and short long)
+     (concatenate 'string (short-str short) "|" (long-str long)))
+    (short
+     (short-str short))
+    (long
+     (long-str long))
+    ;; Cannot happen
+    (t "")))
+
 (serapeum:-> forbid-option (string)
              (values string &optional))
 (defun forbid-option (string)
