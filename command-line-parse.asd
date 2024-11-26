@@ -26,4 +26,4 @@
   :pathname "tests"
   :components ((:file "package")
                (:file "tests" :depends-on ("package")))
-  :depends-on (:command-line-parse :fiveam))
+  :depends-on (:command-line-parse :fiveam :split-sequence :parse-number))
