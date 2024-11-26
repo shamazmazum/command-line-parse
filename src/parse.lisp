@@ -27,6 +27,9 @@
              :format-control   "Abrupt ending of the input: argument ~a missing"
              :format-arguments (list argument))))
 
+(defmethod parse-input ((arguments arguments) input &optional acc)
+  (values (acons (name arguments) input acc) nil t))
+
 (defmethod parse-input ((command command) input &optional acc)
   (if (and input (string= (car input) (command-command command)))
       (values (acons (name command) (command-value command) acc)
