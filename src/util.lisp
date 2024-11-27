@@ -16,12 +16,17 @@
   (:documentation "Mixin for stuff which has a metavar"))
 
 (defclass has-name ()
-  ((name :reader        name
-         :initarg       :name
-         :initform      (error "Specify the name")
-         :type          symbol
-         :documentation "The name of an option, flag or argument"))
-  (:documentation "Mixin for stuff which has a name"))
+  ((name        :reader        name
+                :initarg       :name
+                :initform      (error "Specify the name")
+                :type          symbol
+                :documentation "The name of an option, flag or argument")
+   (description :reader        description
+                :initarg       :description
+                :initform      nil
+                :type          (or-null string)
+                :documentation "Description of a flag / an option / an argument"))
+  (:documentation "Mixin for stuff which has a name and description"))
 
 (defclass is-key ()
   ((short :reader        short

@@ -18,12 +18,16 @@ of a parser. Used by SHOW-USAGE."))
   ()
   (:documentation "A parser for an optional flag in the form '-f' or '--foo'"))
 
-(defun flag (name &key short long)
+(defun flag (name &key short long description)
   "Make a parser for a boolean flag in the short form (like '-f')
 and/or the long form (like '--foo')."
   (unless (or short long)
     (error "Specify either :SHORT or :LONG keys."))
-  (make-instance 'flag :name name :short short :long long))
+  (make-instance 'flag
+                 :name        name
+                 :short       short
+                 :long        long
+                 :description description))
 
 ;; Option
 
@@ -31,12 +35,18 @@ and/or the long form (like '--foo')."
   ()
   (:documentation "A parser for an option in the form '-f VAR' or '--foo VAR'"))
 
-(defun option (name metavar &key short long (fn #'identity))
+(defun option (name metavar &key short long description (fn #'identity))
   "Make a parser for an option in the short form (like '-f VAR')
 and/or the long form (like '--foo VAR')."
   (unless (or short long)
     (error "Specify either :SHORT or :LONG keys."))
-  (make-instance 'option :name name :short short :long long :meta metavar :fn fn))
+  (make-instance 'option
+                 :name        name
+                 :short       short
+                 :long        long
+                 :meta        metavar
+                 :fn          fn
+                 :description description))
 
 ;; Argument
 
@@ -44,19 +54,25 @@ and/or the long form (like '--foo VAR')."
   ()
   (:documentation "A parser for positional argument"))
 
-(defun argument (name meta &key (fn #'identity))
+(defun argument (name meta &key description (fn #'identity))
   "Make a parser for a positional argument."
-  (make-instance 'argument :name name :meta meta :fn fn))
+  (make-instance 'argument
+                 :name        name
+                 :meta        meta
+                 :fn          fn
+                 :description description))
 
 ;; Arguments
 (defclass arguments (has-name)
   ()
   (:documentation "A parser for the rest of an input"))
 
-(defun arguments (name)
+(defun arguments (name &key description)
   "Make a parser for the rest of an input, treating it as a list of
 positional arguments."
-  (make-instance 'arguments :name name))
+  (make-instance 'arguments
+                 :name        name
+                 :description description))
 
 ;; Command
 
@@ -69,10 +85,14 @@ positional arguments."
             :reader   command-value))
   (:documentation "A parser for subcommands"))
 
-(defun command (name command value)
+(defun command (name command value &key description)
   "Make a parser for a subcommand. Produces a cons pair (NAME . VALUE)
 if COMMAND is seen in the input."
-  (make-instance 'command :name name :command command :value value))
+  (make-instance 'command
+                 :name        name
+                 :command     command
+                 :value       value
+                 :description description))
 
 ;; Choice
 
