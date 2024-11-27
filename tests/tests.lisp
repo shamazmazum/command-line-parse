@@ -22,19 +22,30 @@
    (seq
     (command 'what "show-progress" 'show)
     (optional
-     (flag 'verbose :short #\v :long "verbose")
-     (flag 'human   :long "human-readable")))
+     (flag 'verbose
+           :short       #\v
+           :long        "verbose"
+           :description "Be verbose")
+     (flag 'human
+           :long        "human-readable"
+           :description "Human readable output")))
    (seq
     (command 'what "format" 'format)
     (optional
-     (option 'level "LEVEL" :short #\l :long "level" :fn #'parse-number)
-     (flag   'force :long "force"))
-    (argument 'disk "DISK"))
+     (option 'level       "LEVEL"
+             :short       #\l
+             :long        "level"
+             :fn          #'parse-number
+             :description "Format level (1-5)")
+     (flag   'force
+             :long        "force"
+             :description "Format even if already formatted"))
+    (argument 'disk "DISK" :description "Disk to format"))
    (seq
     (command 'what "process" 'process)
     (choice
-     (flag 'quick :short #\q)
-     (flag 'slow  :short #\s))
+     (flag 'quick :short #\q :description "Quick processing")
+     (flag 'slow  :short #\s :description "Slow processing"))
     (arguments 'args))))
 
 (defparameter *parser-2*

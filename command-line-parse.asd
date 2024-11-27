@@ -12,7 +12,7 @@
                (:file "parse")
                (:file "usage")
                (:file "impure"))
-  :depends-on (:serapeum)
+  :depends-on (:serapeum :alexandria)
   :in-order-to ((test-op (load-op "command-line-parse/tests")))
   :perform (test-op (op system)
                     (declare (ignore op system))

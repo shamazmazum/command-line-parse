@@ -14,7 +14,7 @@ of a parser. Used by SHOW-USAGE."))
 
 ;; Flag
 
-(defclass flag (has-name is-key)
+(defclass flag (parser has-name is-key)
   ()
   (:documentation "A parser for an optional flag in the form '-f' or '--foo'"))
 
@@ -31,7 +31,7 @@ and/or the long form (like '--foo')."
 
 ;; Option
 
-(defclass option (has-name is-key has-metavar)
+(defclass option (parser has-name is-key has-metavar)
   ()
   (:documentation "A parser for an option in the form '-f VAR' or '--foo VAR'"))
 
@@ -50,7 +50,7 @@ and/or the long form (like '--foo VAR')."
 
 ;; Argument
 
-(defclass argument (has-name has-metavar)
+(defclass argument (parser has-name has-metavar)
   ()
   (:documentation "A parser for positional argument"))
 
@@ -63,7 +63,7 @@ and/or the long form (like '--foo VAR')."
                  :description description))
 
 ;; Arguments
-(defclass arguments (has-name)
+(defclass arguments (parser has-name)
   ()
   (:documentation "A parser for the rest of an input"))
 
@@ -76,7 +76,7 @@ positional arguments."
 
 ;; Command
 
-(defclass command (has-name)
+(defclass command (parser has-name)
   ((command :initarg  :command
             :initform (error "Specify a command")
             :reader   command-command)
@@ -96,7 +96,7 @@ if COMMAND is seen in the input."
 
 ;; Choice
 
-(defclass choice (has-children)
+(defclass choice (parser has-children)
   ()
   (:documentation "Returns what the first working parser returns"))
 
@@ -107,7 +107,7 @@ returns."
 
 ;; Repeat
 
-(defclass rep (has-child)
+(defclass rep (parser has-child)
   ()
   (:documentation "A repeating parser"))
 
@@ -116,7 +116,7 @@ returns."
 
 ;; Sequence
 
-(defclass seq (has-children)
+(defclass seq (parser has-children)
   ()
   (:documentation "A sequence of parsers"))
 
@@ -127,7 +127,7 @@ parsers succeed when applied in sequential order."
 
 ;; End of options guard
 
-(defclass end-of-options-guard (has-child)
+(defclass end-of-options-guard (parser has-child)
   ()
   (:documentation "A parser which fails when its child fails or when
 it consumes the end of options mark ('--')"))
@@ -138,7 +138,7 @@ it consumes the end of options mark ('--')"))
 
 ;; Optional
 
-(defclass optional (has-child)
+(defclass optional (parser has-child)
   ()
   (:documentation "A wrapper parser for options and flags"))
 

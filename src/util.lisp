@@ -2,6 +2,9 @@
 
 (deftype or-null (type) `(or ,type null))
 
+(defclass parser () ()
+  (:documentation "Generic parser class (for type checking)"))
+
 ;; Useful mixins
 
 (defclass has-metavar ()
