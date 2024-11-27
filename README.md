@@ -1,4 +1,5 @@
 # command-line-parse
+[![CI tests](https://github.com/shamazmazum/command-line-parse/actions/workflows/test.yml/badge.svg)](https://github.com/shamazmazum/command-line-parse/actions/workflows/test.yml)
 
 Yet another command line parsing utility for Common Lisp.
 
