@@ -7,8 +7,8 @@
 new accumulator, the rest of input and a boolean variable indicating
 the success. Used by PARSE."))
 
-(defgeneric show-parser (parser) (:documentation "Text representation
-of a parser. Used by SHOW-USAGE."))
+(defgeneric print-parser (parser stream)
+  (:documentation "Text representation of a parser. Used by SHOW-USAGE."))
 
 ;;;; Parsers
 

@@ -1,48 +1,68 @@
 (in-package :command-line-parse)
 
-;; Usage printing
+(defmethod print-parser ((flag flag) stream)
+  (princ (show-flag (long flag) (short flag)) stream))
 
-(defmethod show-parser ((flag flag))
-  (show-flag (long flag) (short flag)))
+(defmethod print-parser ((option option) stream)
+  (princ (show-flag (long option) (short option)) stream)
+  (princ " " stream)
+  (princ (meta option) stream))
 
-(defmethod show-parser ((option option))
-  (concatenate
-   'string
-   (show-flag (long option) (short option))
-   " "
-   (meta option)))
+(defmethod print-parser ((command command) stream)
+  (princ (command-command command) stream))
 
-(defmethod show-parser ((command command))
-  (command-command command))
+(defmethod print-parser ((argument argument) stream)
+  (princ (meta argument) stream))
 
-(defmethod show-parser ((argument argument))
-  (meta argument))
+(defmethod print-parser ((arguments arguments) stream)
+  (princ "ARGUMENTS*" stream))
 
-(defmethod show-parser ((arguments arguments))
-  "ARGUMENTS*")
+(defmethod print-parser ((optional optional) stream)
+  (let ((children (children (child (child (child optional))))))
+    (pprint-logical-block (stream children)
+      (loop for tail on children
+            for (child . rest) = tail do
+            (write-char #\[ stream)
+            (print-parser child stream)
+            (write-char #\] stream)
+            (when rest
+              (write-char #\Space stream))
+            (pprint-newline :fill stream)
+            (pprint-indent :current 0)))))
 
-(defmethod show-parser ((choice choice))
-  (format
-   nil "~{(~a)~^ | ~}"
-   (mapcar #'show-parser (children choice))))
+(defmethod print-parser ((seq seq) stream)
+  (let ((children (children seq)))
+    (pprint-logical-block (stream children)
+      (loop for tail on children
+            for (child . rest) = tail do
+            (print-parser child stream)
+            (when rest
+              (write-char #\Space stream))
+            (pprint-newline :fill stream)
+            (pprint-indent :current 0)))))
 
-(defmethod show-parser ((optional optional))
-  (format
-   nil "~{[~a]~^ ~}"
-   (mapcar #'show-parser
-           (children (child (child (child optional)))))))
-
-(defmethod show-parser ((seq seq))
-  (format
-   nil "~{~a~^ ~}"
-   (mapcar #'show-parser (children seq))))
+(defmethod print-parser ((choice choice) stream)
+  (let ((children (children choice)))
+    (pprint-logical-block (stream children)
+      (loop for tail on children
+            for (child . rest) = tail do
+            (print-parser child stream)
+            (when rest
+              (princ " | " stream))
+            (pprint-newline :fill stream)
+            (pprint-indent :current 0)))))
 
 ;; Description printing
+
+(serapeum:-> show-parser (parser)
+             (values string &optional))
+(defun show-parser (parser)
+  (with-output-to-string (out)
+    (print-parser parser out)))
 
 (serapeum:-> collect-descriptions (parser)
              (values list &optional))
 (defun collect-descriptions (parser)
-  (declare (optimize (speed 3)))
   (labels ((%go (acc parser)
              (let ((acc
                     (if (and (typep parser 'has-name)
@@ -67,16 +87,13 @@
     (if descriptions
         (let ((position
                (+ (reduce #'max descriptions :key (alexandria:compose #'length #'car)) 5)))
-          (apply #'concatenate 'string
-                 (mapcar (lambda (description)
-                           (concatenate
-                            'string
-                            (car description)
-                            (loop repeat (- position (length (car description)))
-                                  collect #\Space)
-                            (cdr description)
-                            '(#\NewLine)))
-                         descriptions))))))
+          (with-output-to-string (out)
+            (loop for description in descriptions do
+                  (princ (car description) out)
+                  (loop repeat (- position (length (car description))) do
+                        (write-char #\Space out))
+                  (princ (cdr description) out)
+                  (write-char #\NewLine out)))))))
 
 ;; Final usage function
 
@@ -84,14 +101,13 @@
              (values string &optional))
 (defun show-usage (program-name parser)
   "Get a usage help string for a parser"
-  (concatenate
-   'string
-   (format nil "Usage: ~a ~a" program-name (show-parser parser))
-   (let ((descriptions (show-descriptions parser)))
-     (if descriptions
-         (concatenate
-          'string
-          '(#\NewLine #\NewLine)
-          "Options and arguments description:"
-          '(#\NewLine)
-          descriptions)))))
+  (with-output-to-string (out)
+    (format out "Usage: ~a " program-name)
+    (print-parser parser out)
+    (terpri out)
+    (let ((descriptions (show-descriptions parser)))
+      (when descriptions
+        (terpri out)
+        (princ "Options and arguments description:" out)
+        (terpri out)
+        (princ descriptions out)))))
