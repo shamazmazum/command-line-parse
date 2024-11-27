@@ -12,5 +12,5 @@
            #:show-usage
            #:cmd-line-parse-error
 
-           #:parse-impure
-           #:show-usage-impure))
+           #:parse-argv
+           #:print-usage))

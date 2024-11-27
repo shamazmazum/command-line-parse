@@ -97,9 +97,9 @@
 
 ;; Final usage function
 
-(serapeum:-> show-usage (string parser)
+(serapeum:-> show-usage (parser string)
              (values string &optional))
-(defun show-usage (program-name parser)
+(defun show-usage (parser program-name)
   "Get a usage help string for a parser"
   (with-output-to-string (out)
     (format out "Usage: ~a " program-name)

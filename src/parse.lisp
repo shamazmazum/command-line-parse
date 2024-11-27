@@ -87,7 +87,8 @@
 ;; Final parsing function
 
 (defun parse (parser input)
-  "Parse a list of command line arguments INPUT using a PARSER."
+  "Parse a list of command line arguments INPUT using a
+PARSER. Signals CMD-LINE-PARSE-ERROR on failure."
   (multiple-value-bind (result rest)
       (parse-input parser input)
     (when rest
