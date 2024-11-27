@@ -157,7 +157,7 @@ CL-USER> (command-line-parse:parse foo::*parser* '("-s" "--" "-p"))
 * `flag` — Boolean flag
 * `option` — Option
 * `argument` — Positional argument
-* `arguments` — Matched the whole rest of the input. Returns a list. May be
+* `arguments` — Matches the whole rest of the input. Returns a list. May be
   useful for an arbitrary number of positional arguments.
 * `command` — Matches a subcommand
 * `choice` — Either `a` or `b` or `c` etc. Matches the first succeeding parser.
