@@ -17,40 +17,31 @@
 (defmethod print-parser ((arguments arguments) stream)
   (princ "ARGUMENTS*" stream))
 
+(defun print-children (children stream &key prefix suffix separator)
+  (pprint-logical-block (stream children)
+    (loop
+     (pprint-exit-if-list-exhausted)
+     (when prefix
+       (write-char prefix stream))
+     (print-parser (pprint-pop) stream)
+     (when suffix
+       (write-char suffix stream))
+     (pprint-exit-if-list-exhausted)
+     (princ separator stream)
+     (pprint-newline :fill stream)
+     (pprint-indent :current 0))))
+
 (defmethod print-parser ((optional optional) stream)
-  (let ((children (children (child (child (child optional))))))
-    (pprint-logical-block (stream children)
-      (loop for tail on children
-            for (child . rest) = tail do
-            (write-char #\[ stream)
-            (print-parser child stream)
-            (write-char #\] stream)
-            (when rest
-              (write-char #\Space stream))
-            (pprint-newline :fill stream)
-            (pprint-indent :current 0)))))
+  (print-children (children (child (child (child optional)))) stream
+                  :prefix #\[ :suffix #\] :separator #\Space))
 
 (defmethod print-parser ((seq seq) stream)
-  (let ((children (children seq)))
-    (pprint-logical-block (stream children)
-      (loop for tail on children
-            for (child . rest) = tail do
-            (print-parser child stream)
-            (when rest
-              (write-char #\Space stream))
-            (pprint-newline :fill stream)
-            (pprint-indent :current 0)))))
+  (print-children (children seq) stream
+                  :separator #\Space))
 
 (defmethod print-parser ((choice choice) stream)
-  (let ((children (children choice)))
-    (pprint-logical-block (stream children)
-      (loop for tail on children
-            for (child . rest) = tail do
-            (print-parser child stream)
-            (when rest
-              (princ " | " stream))
-            (pprint-newline :fill stream)
-            (pprint-indent :current 0)))))
+  (print-children (children choice) stream
+                  :separator " | "))
 
 ;; Description printing
 
