@@ -89,8 +89,12 @@
 (defun parse (parser input)
   "Parse a list of command line arguments INPUT using a
 PARSER. Signals CMD-LINE-PARSE-ERROR on failure."
-  (multiple-value-bind (result rest)
+  (multiple-value-bind (result rest successp)
       (parse-input parser input)
+    (unless successp
+      (error 'cmd-line-parse-error
+             :format-control   "Parser was not successful: ~a"
+             :format-arguments (list parser)))
     (when rest
       (error 'cmd-line-parse-error
              :format-control   "Unparsed input remians: ~s"
