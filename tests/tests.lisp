@@ -97,7 +97,7 @@
   (let ((list (parse *parser-2* (split-args "--foo foo bar"))))
     (is (eq (%assoc 'foo list) t))
     (is (eq (%assoc 'bar list) nil))
-    (is (string= (%assoc 'arg0 list) "foo"))
+    (is (string= (%assoc 'arg0 list) "bar"))
     (is (string= (%assoc 'arg1 list) "bar"))))
 
 (test parser2-failure
