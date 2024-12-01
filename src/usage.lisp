@@ -51,6 +51,27 @@
   (with-output-to-string (out)
     (print-parser parser out)))
 
+(deftype description-type () '(member :command :option :argument :unknown))
+
+(serapeum:defconstructor description-info
+  (show  string)
+  (descr string)
+  (type  description-type))
+
+(serapeum:-> description-type (parser)
+             (values description-type &optional))
+(defun description-type (parser)
+  (cond
+    ((or (typep parser 'argument)
+         (typep parser 'arguments))
+     :argument)
+    ((or (typep parser 'flag)
+         (typep parser 'option))
+     :option)
+    ((typep parser 'command)
+     :command)
+    (t :unknown)))
+
 (serapeum:-> collect-descriptions (parser)
              (values list &optional))
 (defun collect-descriptions (parser)
@@ -58,9 +79,11 @@
              (let ((acc
                     (if (and (typep parser 'has-name)
                              (description parser))
-                        (acons (show-parser parser)
+                        (cons (description-info
+                               (show-parser parser)
                                (description parser)
-                               acc)
+                               (description-type parser))
+                              acc)
                         acc)))
                (cond
                  ((typep parser 'has-children)
@@ -71,20 +94,44 @@
                  (t acc)))))
     (%go nil parser)))
 
-(serapeum:-> show-descriptions (parser)
+(serapeum:-> show-descriptions (parser stream)
              (values (or-null string) &optional))
-(defun show-descriptions (parser)
-  (let ((descriptions (collect-descriptions parser)))
-    (if descriptions
-        (let ((position
-               (+ (reduce #'max descriptions :key (alexandria:compose #'length #'car)) 5)))
-          (with-output-to-string (out)
-            (loop for description in descriptions do
-                  (princ (car description) out)
-                  (loop repeat (- position (length (car description))) do
-                        (write-char #\Space out))
-                  (princ (cdr description) out)
-                  (write-char #\NewLine out)))))))
+(defun show-descriptions (parser output)
+  (flet ((description-type-member (list)
+           (lambda (description)
+             (member (description-info-type description) list :test #'eq)))
+         (show-block (descriptions)
+           (let ((position
+                  (+ (reduce #'max descriptions
+                             :key (alexandria:compose #'length #'description-info-show))
+                     5)))
+             (with-output-to-string (out)
+               (loop for description in descriptions do
+                     (princ (description-info-show description) out)
+                     (loop repeat (- position (length (description-info-show description))) do
+                           (write-char #\Space out))
+                     (princ (description-info-descr description) out)
+                     (write-char #\NewLine out))))))
+    (let* ((descriptions (collect-descriptions parser))
+           (commands  (remove-if-not (description-type-member '(:command)) descriptions))
+           (arguments (remove-if-not (description-type-member '(:argument)) descriptions))
+           (options   (remove-if-not (description-type-member '(:option :unknown))
+                                     descriptions)))
+      (when commands
+        (terpri output)
+        (princ "Description of commands" output)
+        (terpri output)
+        (princ (show-block commands) output))
+      (when arguments
+        (terpri output)
+        (princ "Description of arguments" output)
+        (terpri output)
+        (princ (show-block arguments) output))
+      (when options
+        (terpri output)
+        (princ "Description of flags and options" output)
+        (terpri output)
+        (princ (show-block options) output)))))
 
 ;; Final usage function
 
@@ -96,9 +143,4 @@
     (format out "Usage: ~a " program-name)
     (print-parser parser out)
     (terpri out)
-    (let ((descriptions (show-descriptions parser)))
-      (when descriptions
-        (terpri out)
-        (princ "Options and arguments description:" out)
-        (terpri out)
-        (princ descriptions out)))))
+    (show-descriptions parser out)))
