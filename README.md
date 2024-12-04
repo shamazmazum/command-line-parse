@@ -186,3 +186,13 @@ and `(command-line-arguments)`.
 Their pure counterparts are `parse` and `show-usage`. The latter uses the
 standard pretty printer, but wrapped in `with-output-to-string`, so I consider
 it pure anyway.
+
+## Helper functions
+
+There is `(%assoc KEY ALIST DEFAULT)` function which is equivalent to
+
+``` lisp
+(or (cdr (assoc key alist :test #'eq)) default)
+```
+
+It can be useful for querying results of `parse` and `parse-argv`.

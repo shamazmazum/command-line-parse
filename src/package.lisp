@@ -13,4 +13,5 @@
            #:cmd-line-parse-error
 
            #:parse-argv
-           #:print-usage))
+           #:print-usage
+           #:%assoc))

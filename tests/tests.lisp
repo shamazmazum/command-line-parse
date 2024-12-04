@@ -15,9 +15,6 @@
 (defun split-args (args)
   (split-sequence #\Space args))
 
-(defun %assoc (item list)
-  (cdr (assoc item list)))
-
 (defparameter *parser-1*
   (choice
    (seq

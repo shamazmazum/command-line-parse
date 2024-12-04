@@ -113,3 +113,8 @@ CMD-LINE-PARSE-ERROR."
              :format-control   "Value expected, got ~a"
              :format-arguments (list string))
       string))
+
+(defun %assoc (key alist &optional default)
+  "Equals to (OR (CDR (ASSOC ALIST :TEST #'EQ)) DEFAULT). Useful to query
+results of PARSE."
+  (or (cdr (assoc key alist :test #'eq)) default))
